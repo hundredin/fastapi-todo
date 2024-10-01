@@ -1,0 +1,30 @@
+x-environment:
+    &default-environment
+    POSTGRES_USER: vscode
+    POSTGRES_PASSWORD: notsecure
+    POSTGRES_DB: testdb
+
+services:
+    app:
+        build:
+            context: ..
+            dockerfile: .devcontainer/Dockerfile
+        environment:
+            <<: *default-environment
+            PORT: 8000
+        ports:
+            - 8000:8000
+        volumes:
+            - ..:/workspace
+        user: vscode
+        command: sleep infinity
+    db:
+        image: "postgres:16"
+        restart: unless-stopped
+        environment: *default-environment
+        ports:
+            - 5432:5432
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+volumes:
+    pgdata:
