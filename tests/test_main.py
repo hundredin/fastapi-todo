@@ -78,3 +78,14 @@ async def test_done_flag(async_client):
     # 이미 완료 플래그가 해제되었으므로 404 에러가 발생해야 함
     response = await async_client.delete("/tasks/1/done")
     assert response.status_code == starlette.status.HTTP_404_NOT_FOUND
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("input_param, expectation", [
+    ("2024-12-01", starlette.status.HTTP_200_OK),
+    ("2024-12-32", starlette.status.HTTP_422_UNPROCESSABLE_ENTITY),
+    ("20241201", starlette.status.HTTP_422_UNPROCESSABLE_ENTITY),
+    ("2024/12/01", starlette.status.HTTP_422_UNPROCESSABLE_ENTITY)
+])
+async def test_due_date(input_param, expectation, async_client):
+    response = await async_client.post("/tasks", json={"title": "test task", "due_date": input_param})
+    assert response.status_code == expectation
