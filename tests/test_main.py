@@ -13,19 +13,15 @@ DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
 engine = create_async_engine(DATABASE_URL, echo=True)
 AsyncSessionLocal = sessionmaker(
-    bind=engine,
-    class_=AsyncSession,
-    expire_on_commit=False
+    bind=engine, class_=AsyncSession, expire_on_commit=False
 )
+
 
 @pytest_asyncio.fixture
 async def async_client() -> AsyncClient:
     # 비동기식 db 접속을 위한 엔진과 세션을 작성
     async_engine = create_async_engine(DATABASE_URL, echo=True)
-    async_session = async_sessionmaker(
-        bind=async_engine,
-        expire_on_commit=False
-    )
+    async_session = async_sessionmaker(bind=async_engine, expire_on_commit=False)
 
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
@@ -39,8 +35,11 @@ async def async_client() -> AsyncClient:
     app.dependency_overrides[get_db] = get_test_db
 
     # 테스트용 비동기 HTTP 클라이언트 반환
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
         yield client
+
 
 @pytest.mark.asyncio
 async def test_create_task(async_client):
@@ -55,6 +54,7 @@ async def test_create_task(async_client):
     assert len(response_obj) == 1
     assert response_obj[0]["title"] == "test task"
     assert response_obj[0]["done"] is False
+
 
 @pytest.mark.asyncio
 async def test_done_flag(async_client):
@@ -79,13 +79,19 @@ async def test_done_flag(async_client):
     response = await async_client.delete("/tasks/1/done")
     assert response.status_code == starlette.status.HTTP_404_NOT_FOUND
 
+
 @pytest.mark.asyncio
-@pytest.mark.parametrize("input_param, expectation", [
-    ("2024-12-01", starlette.status.HTTP_200_OK),
-    ("2024-12-32", starlette.status.HTTP_422_UNPROCESSABLE_ENTITY),
-    ("20241201", starlette.status.HTTP_422_UNPROCESSABLE_ENTITY),
-    ("2024/12/01", starlette.status.HTTP_422_UNPROCESSABLE_ENTITY)
-])
+@pytest.mark.parametrize(
+    "input_param, expectation",
+    [
+        ("2024-12-01", starlette.status.HTTP_200_OK),
+        ("2024-12-32", starlette.status.HTTP_422_UNPROCESSABLE_ENTITY),
+        ("20241201", starlette.status.HTTP_422_UNPROCESSABLE_ENTITY),
+        ("2024/12/01", starlette.status.HTTP_422_UNPROCESSABLE_ENTITY),
+    ],
+)
 async def test_due_date(input_param, expectation, async_client):
-    response = await async_client.post("/tasks", json={"title": "test task", "due_date": input_param})
+    response = await async_client.post(
+        "/tasks", json={"title": "test task", "due_date": input_param}
+    )
     assert response.status_code == expectation

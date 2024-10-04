@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 
 from api.models import Base
 
+
 class Task(Base):
     __tablename__ = "tasks"
 
@@ -11,6 +12,7 @@ class Task(Base):
     due_date = Column(Date)
 
     done = relationship("Done", back_populates="task", cascade="delete")
+
 
 class Done(Base):
     __tablename__ = "dones"
