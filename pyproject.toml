@@ -16,6 +16,7 @@ asyncpg = "^0.29.0"
 psycopg = {extras = ["binary"], version = "^3.2.3"}
 alembic = "^1.13.3"
 black = "^24.8.0"
+mypy = "^1.14.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -25,3 +26,15 @@ aiosqlite = "^0.20.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
+
+[tool.mypy]
+mypy_path = "api"
+check_untyped_defs = true
+plugins = "sqlalchemy.ext.mypy.plugin"
+
+[tool.isort]
+line_length = 120
+profile = "black"

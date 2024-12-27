@@ -1,5 +1,4 @@
-x-environment:
-    &default-environment
+x-environment: &default-environment
     POSTGRES_USER: vscode
     POSTGRES_PASSWORD: notsecure
     POSTGRES_DB: testdb
