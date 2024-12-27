@@ -12,9 +12,7 @@ from api.main import app
 DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
 engine = create_async_engine(DATABASE_URL, echo=True)
-AsyncSessionLocal = sessionmaker(
-    bind=engine, class_=AsyncSession, expire_on_commit=False
-)
+AsyncSessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
 
 @pytest_asyncio.fixture
@@ -35,9 +33,7 @@ async def async_client() -> AsyncClient:
     app.dependency_overrides[get_db] = get_test_db
 
     # 테스트용 비동기 HTTP 클라이언트 반환
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         yield client
 
 
@@ -91,7 +87,5 @@ async def test_done_flag(async_client):
     ],
 )
 async def test_due_date(input_param, expectation, async_client):
-    response = await async_client.post(
-        "/tasks", json={"title": "test task", "due_date": input_param}
-    )
+    response = await async_client.post("/tasks", json={"title": "test task", "due_date": input_param})
     assert response.status_code == expectation

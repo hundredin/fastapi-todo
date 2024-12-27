@@ -1,5 +1,7 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date
-from sqlalchemy.orm import relationship
+from datetime import date
+
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from api.models import Base
 
@@ -7,9 +9,9 @@ from api.models import Base
 class Task(Base):
     __tablename__ = "tasks"
 
-    id = Column(Integer, primary_key=True)
-    title = Column(String(1024))
-    due_date = Column(Date)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column("title")
+    due_date: Mapped[date] = mapped_column("due_date", nullable=True)
 
     done = relationship("Done", back_populates="task", cascade="delete")
 
@@ -17,6 +19,6 @@ class Task(Base):
 class Done(Base):
     __tablename__ = "dones"
 
-    id = Column(Integer, ForeignKey("tasks.id"), primary_key=True)
+    id: Mapped[int] = mapped_column(ForeignKey("tasks.id"), primary_key=True)
 
     task = relationship("Task", back_populates="done")

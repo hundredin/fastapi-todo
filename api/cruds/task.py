@@ -31,9 +31,7 @@ async def get_tasks_with_done(db: AsyncSession) -> list[tuple[int, str, bool]]:
 
 
 async def get_task(db: AsyncSession, task_id: int) -> task_model.Task | None:
-    result: Result = await db.execute(
-        select(task_model.Task).filter(task_model.Task.id == task_id)
-    )
+    result: Result = await db.execute(select(task_model.Task).filter(task_model.Task.id == task_id))
 
     return result.scalars().first()
 
